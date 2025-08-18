@@ -27,7 +27,7 @@ exports.deleteCategory = async (id) => {
 /* Products  */
 exports.getAllProducts = async () => {
     //const [rows] = await db.query('SELECT p.product_id, p.name, p.description, p.price, p.stock_quantity, p.sku, c.name as category, pi.image_url as image FROM products p JOIN categories c ON p.category_id = c.category_id LEFT JOIN product_images pi ON pi.product_id = p.product_id');
-    const [rows] = await db.query('SELECT p.product_id, p.name, p.description, p.price, p.stock_quantity, p.sku, c.name AS category, GROUP_CONCAT(pi.image_url) AS image FROM products p JOIN categories c ON p.category_id = c.category_id LEFT JOIN product_images pi ON pi.product_id = p.product_id GROUP BY p.product_id, p.name, p.description, p.price, p.stock_quantity, p.sku, c.name');
+    const [rows] = await db.query('SELECT p.product_id, p.name, p.description, p.price, p.stock_quantity, p.sku,c.category_id, c.name AS category, GROUP_CONCAT(pi.image_url) AS image FROM products p JOIN categories c ON p.category_id = c.category_id LEFT JOIN product_images pi ON pi.product_id = p.product_id GROUP BY p.product_id, p.name, p.description, p.price, p.stock_quantity, p.sku, c.name');
 
     
     return rows;

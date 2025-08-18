@@ -1,4 +1,5 @@
 const Product = require('../models/productModel');
+const db = require('../db');
 
 exports.getAllCategory = async (req, res) => {
   const cat = await Product.getAllCategory();
@@ -47,7 +48,43 @@ exports.deleteProduct = async (req, res) => {
   res.json({ message: 'Product deleted' });
 };
 
+/*
 exports.createProduct = async (req, res) => {
   const id = await Product.createProduct(req.body);
   res.status(201).json({ id });
+};
+*/
+
+exports.createProduct = async (req, res) => {
+  const { name, description, price, sku, stock_quantity, category_id } = req.body;
+
+  try { 
+
+    
+
+    // Step 1: Insert product with imageId
+    const [productResult] = await db.execute(
+      'INSERT INTO products (name, description, price, sku, stock_quantity, category_id) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, description, price, sku, stock_quantity, category_id]
+    );
+
+    // Step 2: Insert image
+    /*
+    const [imageResult] = await db.execute(
+      'INSERT INTO images (url, alt_text) VALUES (?, ?)',
+      [imageUrl, altText]
+    );
+    const imageId = imageResult.insertId;
+    */
+
+
+    res.status(201).json({
+      message: 'Product created successfully',
+      productId: productResult.insertId,
+      //imageId: imageId
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to create product' });
+  }
 };

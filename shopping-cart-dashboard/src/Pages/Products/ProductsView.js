@@ -26,7 +26,7 @@ function ProductsView() {
     const [showModal, setShowModal] = useState(false);
     //const [modalOpen, setModalOpen] = useState(false);    
     //const [newProduct, setNewProduct] = useState({name: '', description: '', price: '', category_id: '', stock_quantity: '', sku: '' });
-    const [formData, setFormData] = useState({ name: '', description: '', price: '', category_id: '', stock_quantity: '', sku: '' });
+    const [formData, setFormData] = useState({ name: '', description: '', price: '', category_id: '', category_name: '', stock_quantity: '', sku: '' });
     const [open, setOpen] = useState(false);
 
 
@@ -84,7 +84,7 @@ function ProductsView() {
         const openAddModal = () => {
             setEditProduct(null);
             //setFormData({ name: '', price: '', description: '', category_id: '' });
-            setFormData({ name: '', description: '', price: '', category_id: '', stock_quantity: '', sku: '' });
+            setFormData({ name: '', description: '', price: '', category_id: '', category_name: '', stock_quantity: '', sku: '' });
             setShowModal(true);
         };
 
@@ -98,7 +98,7 @@ function ProductsView() {
                 price: product.price,
                 description: product.description,
                 stock_quantity: product.stock_quantity,
-                category_id: product.category,
+                category_id: product.category_id,
                 sku: product.sku,
             });
             setShowModal(true);
@@ -147,6 +147,7 @@ function ProductsView() {
                               <TableCell>SKU </TableCell>
                               <TableCell>Stock </TableCell>
                               <TableCell>Category </TableCell>
+                              <TableCell>Category id </TableCell>
                               <TableCell align="right">Actions</TableCell>
                             </TableRow>
                           </TableHead>
@@ -160,6 +161,7 @@ function ProductsView() {
                                 <TableCell>{product.sku}</TableCell>
                                 <TableCell>{product.stock_quantity}</TableCell>
                                 <TableCell>{product.category}</TableCell>
+                                <TableCell>{product.category_id}</TableCell>
                                 <TableCell align="right">
                                   <Button
                                     variant="outlined"
@@ -276,6 +278,7 @@ function ProductsView() {
                                         <label htmlFor="categorySelect" className="form-label fw-bold text-gray-700">
                                             Category
                                         </label>
+                                        { console.log("Anil: ",formData)}
                                         <select
                                             id="categorySelect"
                                             className="form-select"
