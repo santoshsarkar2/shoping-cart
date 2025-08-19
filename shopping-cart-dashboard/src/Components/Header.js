@@ -43,6 +43,7 @@ function Header({ themeColor, setThemeColor, isLoggedIn, setIsLoggedIn }) {
         </Link>
         <Link to="/">Home</Link>
         <Link to="/help">Help</Link>
+        <Link to="/example">Examples</Link>
 
       </nav>
       <div className="header-nav-right">

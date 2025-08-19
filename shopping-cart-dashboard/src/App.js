@@ -19,6 +19,7 @@ import { getToken,getAuthHeaders } from './Services/authService'
 import CategoryView from './Pages/Products/CategoryView';
 import UsersList from './Pages/Users/UsersList';
 import UpdateProfile from './Pages/Users/UpdateProfile';
+import Example from './Pages/Example';
 
 
 
@@ -116,6 +117,7 @@ function App() {
               <Route path="/category" element={<CategoryView />} />
               <Route path="/orders" element={<OrdersView />} />
               <Route path="/help" element={<Help />} />
+              <Route path="/example" element={<Example />} />
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/profile/edit" element={<UpdateProfile />} />

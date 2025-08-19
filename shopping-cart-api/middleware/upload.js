@@ -2,46 +2,40 @@
 const multer = require('multer');
 const path = require('path');
 
+// Ensure uploads/avatars directory exists
+const createUploadDir = () => {
+  const uploadDir = 'uploads/avatars';
+  const fs = require('fs');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+};
+
+createUploadDir();
+
 const storage = multer.diskStorage({
-  destination: './uploads/',
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/avatars/');
+  },
   filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + file.originalname;
-    cb(null, uniqueName);
+    const ext = path.extname(file.originalname);
+    const filename = `avatar_${Date.now()}${ext}`;
+    cb(null, filename);
   }
 });
 
-//const upload = multer({ storage });
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only images are allowed'), false);
+  }
+};
+
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
-    
-    if (extname && mimetype) {
-      return cb(null, true);
-    }
-    cb('Error: Images only (jpeg, jpg, png)!');
-  }
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
 });
-
-/*
-// Middleware
-app.use(express.json());
-app.use('/uploads', express.static('uploads'));
-
-// Create uploads directory if it doesn't exist
-async function ensureUploadDir() {
-  try {
-    await fs.mkdir('uploads', { recursive: true });
-  } catch (err) {
-    console.error('Error creating upload directory:', err);
-  }
-}
-  */
-
-
-
 
 module.exports = upload;

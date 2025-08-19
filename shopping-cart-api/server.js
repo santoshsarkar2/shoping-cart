@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const bodyParser = require('body-parser');
 
 const userRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
@@ -13,6 +14,12 @@ const app = express();
 // Middleware
 app.use(cors({ origin: process.env.ALLOWED_ORIGINS || 'http://localhost:3000' }));
 app.use(express.json());
+
+app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static uploads
+app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.use('/api/products', productRoutes);

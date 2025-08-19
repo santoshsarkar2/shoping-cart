@@ -1,164 +1,134 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  TextField,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button,
+  TextField, TextareaAutosize, Dialog, DialogActions, DialogContent, DialogTitle,
 } from '@mui/material';
-import { getAllUsers, addUser, updateUser } from '../../Services/authService';
+//import { getAllUsers } from '../../Services/authService'
+import { getAllUsers, updateProfile, addUser,updateUser } from '../../Services/authService'
 
 const UsersList = () => {
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [users, setUsers] = useState([])
   const [editUser, setEditUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({ first_name: '', last_name: '', email: '', password: '', address: '' });
   const [open, setOpen] = useState(false);
-  const [errors, setErrors] = useState({ email: false, password: false });
-  const [searchQuery, setSearchQuery] = useState('');
+  const [errors, setErrors] = useState({
+    email: false,
+    password: false,
+  });
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    // Filter users based on search query
-    const filtered = users.filter(user =>
-      user.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredUsers(filtered);
-  }, [searchQuery, users]);
-
   const fetchData = async () => {
     try {
-      const res = await getAllUsers();
+      const res = await getAllUsers(); // Replace with your actual API call
       setUsers(res);
-      setFilteredUsers(res); // Initialize filtered users
+      //console.log("Orders Page: ", orders);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching Orders:", error);
     }
   };
 
+  // Open modal for adding a new product
   const openAddModal = () => {
     setEditUser(null);
     setFormData({ first_name: '', last_name: '', email: '', password: '', address: '' });
-    setErrors({ email: false, password: false });
+    //setShowModal(true);
     setOpen(true);
   };
 
+  // Open modal for editing a product
   const openEditModal = (user) => {
+    //alert(product.name)
     setEditUser(user);
     setFormData({
       user_id: user.user_id,
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
-      password: user.password || '',
+      password: user.password,
       address: user.address
     });
-    setErrors({ email: false, password: false });
+    //setShowModal(true);
     setOpen(true);
   };
-/*
-  const deleteUserHandler = async (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        const response = await deleteUser(id);
-        if (response) {
-          console.log("Deleted User", id);
-          fetchData();
-        } else {
-          console.error('Error deleting user');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    }
-  };
-*/
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: false });
+    setErrors({ ...errors, [e]: false }); // Clear error on change
   };
 
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit2 = async (e) => {
     e.preventDefault();
     const newErrors = {
       email: formData.email.trim() === '',
-      password: !editUser && formData.password.trim() === '', // Password required only for new users
+      password: formData.password.trim() === '',
     };
     setErrors(newErrors);
 
     const hasError = Object.values(newErrors).some((err) => err);
     if (!hasError) {
-      try {
-        let response;
-        if (editUser) {
-          response = await updateUser(formData.user_id, formData);
-        } else {
-          response = await addUser(formData);
-        }
-        if (response) {
-          fetchData();
-          setOpen(false);
-        } else {
-          console.error('Error saving user');
-        }
-      } catch (error) {
-        console.error("Error:", error);
+      console.log('Login submitted:', formData);
+      // Add your authentication logic here
+    }
+
+
+  }
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      let response;
+      if (editUser) {
+        // Edit product (PUT request)
+        response = await updateUser(formData.user_id, formData);
+      } else {
+        // Add Product 
+        response = await addUser(formData);
+        console.log(response);
       }
+      if (response) {
+        fetchData(); // Refresh products list
+        setShowModal(false);
+        setOpen(false);
+
+      } else {
+        console.error('Error saving product');
+      }
+    } catch (error) {
+      console.error("Error :", error);
     }
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+
+
 
   return (
-    <section>
+    <>
       <h1>Users Management</h1>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <TextField
-          label="Search Users"
-          variant="outlined"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          placeholder="Search by first name, last name, or email"
-          style={{ width: '300px' }}
-        />
-        <Button variant="contained" color="primary" onClick={openAddModal}>
-          Add User
-        </Button>
-      </div>
+      <Button variant="contained" color="primary" onClick={openAddModal} style={{ marginBottom: '20px' }}>
+        Add User
+      </Button>
 
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell style={{ fontWeight: 'bold', backgroundColor: '#e3f2fd' }}>User Name</TableCell>
-              <TableCell style={{ fontWeight: 'bold', backgroundColor: '#e3f2fd' }}>Email</TableCell>
-              <TableCell style={{ fontWeight: 'bold', backgroundColor: '#e3f2fd' }}>Address</TableCell>
-              <TableCell style={{ fontWeight: 'bold', backgroundColor: '#e3f2fd' }}>Phone Number</TableCell>
-              <TableCell style={{ fontWeight: 'bold', backgroundColor: '#e3f2fd' }}>Role</TableCell>
-              <TableCell style={{ fontWeight: 'bold', backgroundColor: '#e3f2fd' }} align="right">Actions</TableCell>
+              <TableCell>User Name</TableCell>
+              <TableCell>email </TableCell>
+              <TableCell>Address </TableCell>
+              <TableCell>Ph No </TableCell>
+              <TableCell>Role</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.user_id}>
-                <TableCell>
-                  <img width="50px" src={user.avatar} alt={`${user.first_name} ${user.last_name}`} /> {user.first_name} {user.last_name}
-                </TableCell>
+            {/* {console.log(category)} */}
+            {users.map((user) => (
+              <TableRow key={user.user_d}>
+                <TableCell><img width='50px' src={user.avatar} /> {user.first_name} {user.last_name}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.address}</TableCell>
                 <TableCell>{user.phone_number}</TableCell>
@@ -175,7 +145,7 @@ const UsersList = () => {
                   <Button
                     variant="outlined"
                     color="error"
-                    //onClick={() => deleteUserHandler(user.user_id)}
+                  //onClick={() => deleteCat(cat.category_id)}
                   >
                     Delete
                   </Button>
@@ -186,6 +156,8 @@ const UsersList = () => {
         </Table>
       </TableContainer>
 
+
+      {/* Dialog for Add/Edit */}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>{editUser ? 'Edit User' : 'Add User'}</DialogTitle>
         <DialogContent>
@@ -199,8 +171,10 @@ const UsersList = () => {
             fullWidth
             variant="outlined"
             required
+
           />
           <TextField
+            autoFocus
             margin="dense"
             label="Last Name"
             name="last_name"
@@ -211,6 +185,7 @@ const UsersList = () => {
             required
           />
           <TextField
+            autoFocus
             margin="dense"
             label="Address"
             name="address"
@@ -224,6 +199,7 @@ const UsersList = () => {
           />
           <hr />
           <TextField
+            autoFocus
             margin="dense"
             label="Email"
             name="email"
@@ -235,20 +211,23 @@ const UsersList = () => {
             required
             error={errors.email}
             helperText={errors.email ? 'Email is required' : ''}
+
           />
           <TextField
+            autoFocus
             margin="dense"
             label="Password"
-            name="password"
-            type="password"
+            name="password"            
             value={formData.password}
             onChange={handleInputChange}
             fullWidth
             variant="outlined"
-            required={!editUser} // Password required only for new users
+            required
             error={errors.password}
             helperText={errors.password ? 'Password is required' : ''}
+
           />
+
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
@@ -257,8 +236,11 @@ const UsersList = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </section>
-  );
-};
 
-export default UsersList;
+
+
+    </>
+  )
+}
+
+export default UsersList
