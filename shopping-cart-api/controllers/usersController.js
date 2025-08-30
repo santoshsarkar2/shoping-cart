@@ -73,7 +73,7 @@ exports.createUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-     const avatarUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const avatarUrl = req.file ? `/uploads/${req.file.filename}` : null;
 
     console.log("file Name: ",avatarUrl);
     const [result] = await db.query(
